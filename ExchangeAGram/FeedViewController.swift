@@ -39,6 +39,7 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
         return 1
     }
     
+    // The number of photos in the CollectionView
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return feedArray.count
     }
@@ -54,6 +55,17 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
         cell.captionLabel.text = thisItem.caption
         
         return cell
+    }
+    
+    // Chooses a photo in the CollectionView
+    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        let thisItem = feedArray[indexPath.row] as! FeedItem
+        
+        // Create a new FilterViewController for adding a filter to our photo
+        var filterVC = FilterViewController()
+        filterVC.thisFeedItem = thisItem
+        
+        self.navigationController?.pushViewController(filterVC, animated: false)
     }
     
     // MARK: - UIImagePickerControllerDelegate Functions

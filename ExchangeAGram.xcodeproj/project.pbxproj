@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1C20FF301B041C060024D22E /* FilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C20FF2F1B041C060024D22E /* FilterViewController.swift */; };
+		1C20FF321B04219B0024D22E /* FilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C20FF311B04219B0024D22E /* FilterCell.swift */; };
 		1C82E2B71B02D7070097A6AA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C82E2B61B02D7070097A6AA /* AppDelegate.swift */; };
 		1C82E2BA1B02D7070097A6AA /* ExchangeAGram.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 1C82E2B81B02D7070097A6AA /* ExchangeAGram.xcdatamodeld */; };
 		1C82E2BF1B02D7070097A6AA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1C82E2BD1B02D7070097A6AA /* Main.storyboard */; };
@@ -31,6 +33,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1C20FF2F1B041C060024D22E /* FilterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterViewController.swift; sourceTree = "<group>"; };
+		1C20FF311B04219B0024D22E /* FilterCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterCell.swift; sourceTree = "<group>"; };
 		1C82E2B11B02D7070097A6AA /* ExchangeAGram.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExchangeAGram.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C82E2B51B02D7070097A6AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1C82E2B61B02D7070097A6AA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -90,6 +94,8 @@
 			children = (
 				1C82E2E11B02EC340097A6AA /* FeedItem.swift */,
 				1C82E2D91B02D9000097A6AA /* FeedViewController.swift */,
+				1C20FF2F1B041C060024D22E /* FilterViewController.swift */,
+				1C20FF311B04219B0024D22E /* FilterCell.swift */,
 				1C82E2DF1B02E8050097A6AA /* Alert.swift */,
 				1C82E2DB1B02E06C0097A6AA /* FeedCell.swift */,
 				1C82E2B61B02D7070097A6AA /* AppDelegate.swift */,
@@ -228,6 +234,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C20FF301B041C060024D22E /* FilterViewController.swift in Sources */,
+				1C20FF321B04219B0024D22E /* FilterCell.swift in Sources */,
 				1C82E2B71B02D7070097A6AA /* AppDelegate.swift in Sources */,
 				1C82E2DC1B02E06C0097A6AA /* FeedCell.swift in Sources */,
 				1C82E2E21B02EC340097A6AA /* FeedItem.swift in Sources */,
@@ -431,6 +439,7 @@
 				1C82E2D51B02D7080097A6AA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		1C82E2D61B02D7080097A6AA /* Build configuration list for PBXNativeTarget "ExchangeAGramTests" */ = {
 			isa = XCConfigurationList;
@@ -439,6 +448,7 @@
 				1C82E2D81B02D7080097A6AA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
