@@ -160,10 +160,5 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
             Alert.showAlertWithText(viewController: self, header: "Photo Library Error", message: "The photo library is not available.")
         }
     }
-    
-    // Show the ProfileViewController
-    @IBAction func profileBarButtonItemPressed(sender: UIBarButtonItem) {
-        self.performSegueWithIdentifier("profileSegue", sender: sender)
-    }
 
 }
