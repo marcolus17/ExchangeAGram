@@ -24,6 +24,9 @@ class FilterViewController: UIViewController, UICollectionViewDelegate, UICollec
     // Used to change the properties of our filters
     let kSaturation = 0.5
     let kIntensity = 0.7
+    
+    // Optimization - Holds a placeholder image for our CollectionView cells
+    let placeHolderImage = UIImage(named: "Placeholder")
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,7 +38,7 @@ class FilterViewController: UIViewController, UICollectionViewDelegate, UICollec
         // Gives the layout borders
         layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         // The size of each item in the CollectionView
-        layout.itemSize = CGSize(width: 150.0, height: 150.0)
+        layout.itemSize = CGSize(width: 140.0, height: 140.0)
         collectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: layout)
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -62,8 +65,32 @@ class FilterViewController: UIViewController, UICollectionViewDelegate, UICollec
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell: FilterCell = collectionView.dequeueReusableCellWithReuseIdentifier("MyCell", forIndexPath: indexPath) as! FilterCell
-        // Grab the selected photo and apply the currently selected filter
-        cell.imageView.image = filteredImageFromImage(thisFeedItem.image, filter: filters[indexPath.row])
+        
+        // Optimization - Prevents the CollectionView from adding a filter to our image each time we scroll, etc.
+        if cell.imageView.image == nil {
+            // Optimization - Using the property to prevent the creation of the placeholder image over and over again
+            cell.imageView.image = placeHolderImage
+            
+            // Use Grand Central Dispatch (GCD) to apply filters without interrupting the main thread
+            // NOTE: Always make UI changes on the main thread!
+            
+            // Create a new queue
+            let filterQueue: dispatch_queue_t = dispatch_queue_create("filter queue", nil)
+            
+            // Run this block of code when the queue is ready to be processed on a background thread
+            dispatch_async(filterQueue, { () -> Void in
+                // Apply the filter to the currently selected photo
+                // Optimization - Apply the filter to the thumbnail instead of the high res photo
+                let filterImage = self.filteredImageFromImage(self.thisFeedItem.thumbnail, filter: self.filters[indexPath.row])
+                
+                // Jump back to the main thread to apply the UI changes
+                // The ImageViews will populate over time because the main thread is waiting for the filters to finish being applied
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    cell.imageView.image = filterImage
+                })
+            })
+        }
+        
         return cell
     }
     

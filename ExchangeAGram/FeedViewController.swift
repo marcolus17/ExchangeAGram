@@ -71,13 +71,17 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
     // MARK: - UIImagePickerControllerDelegate Functions
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [NSObject : AnyObject]) {
         let image = info[UIImagePickerControllerOriginalImage] as! UIImage
+        // Save a high res version of our image
         let imageData = UIImageJPEGRepresentation(image, 1.0)
+        // Save a thumbnail version that is 1/10th the size
+        let thumbNailData = UIImageJPEGRepresentation(image, 0.1)
         
         let managedObjectContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
         let entityDescription = NSEntityDescription.entityForName("FeedItem", inManagedObjectContext: managedObjectContext!)
         let feedItem = FeedItem(entity: entityDescription!, insertIntoManagedObjectContext: managedObjectContext!)
         feedItem.image = imageData
         feedItem.caption = "test caption"
+        feedItem.thumbnail = thumbNailData
         
         (UIApplication.sharedApplication().delegate as! AppDelegate).saveContext()
         
