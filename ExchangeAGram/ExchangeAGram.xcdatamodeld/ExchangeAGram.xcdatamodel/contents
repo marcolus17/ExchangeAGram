@@ -4,8 +4,9 @@
         <attribute name="caption" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="image" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="thumbnail" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="uniqueID" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="FeedItem" positionX="-63" positionY="-18" width="128" height="90"/>
+        <element name="FeedItem" positionX="-63" positionY="-18" width="128" height="105"/>
     </elements>
 </model>

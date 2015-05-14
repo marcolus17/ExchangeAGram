@@ -27,6 +27,8 @@ class FilterViewController: UIViewController, UICollectionViewDelegate, UICollec
     
     // Optimization - Holds a placeholder image for our CollectionView cells
     let placeHolderImage = UIImage(named: "Placeholder")
+    
+    let tmpDirectory = NSTemporaryDirectory()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -81,7 +83,9 @@ class FilterViewController: UIViewController, UICollectionViewDelegate, UICollec
             dispatch_async(filterQueue, { () -> Void in
                 // Apply the filter to the currently selected photo
                 // Optimization - Apply the filter to the thumbnail instead of the high res photo
-                let filterImage = self.filteredImageFromImage(self.thisFeedItem.thumbnail, filter: self.filters[indexPath.row])
+                    // let filterImage = self.filteredImageFromImage(self.thisFeedItem.thumbnail, filter: self.filters[indexPath.row])
+                // Use the cached thumbnail instead of recreating it
+                let filterImage = self.getCachedImage(indexPath.row)
                 
                 // Jump back to the main thread to apply the UI changes
                 // The ImageViews will populate over time because the main thread is waiting for the filters to finish being applied
@@ -92,6 +96,17 @@ class FilterViewController: UIViewController, UICollectionViewDelegate, UICollec
         }
         
         return cell
+    }
+    
+    // Apply the filtered image and save it to CoreData
+    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        let filterImage = self.filteredImageFromImage(self.thisFeedItem.image, filter: self.filters[indexPath.row])
+        let imageData = UIImageJPEGRepresentation(filterImage, 1.0)
+        self.thisFeedItem.image = imageData
+        let thumbnailData = UIImageJPEGRepresentation(filterImage, 0.1)
+        self.thisFeedItem.thumbnail = thumbnailData
+        (UIApplication.sharedApplication().delegate as! AppDelegate).saveContext()
+        self.navigationController?.popViewControllerAnimated(true)
     }
     
     // Return an array of the CIFilters that Apple has provided
@@ -148,6 +163,46 @@ class FilterViewController: UIViewController, UICollectionViewDelegate, UICollec
         return finalImage!
     }
     
+    // MARK: - Caching Functions
+    
+    // Cache the filtered thumbnail image
+    // Image number = indexPath.row
+    func cacheImage(imageNumber: Int) {
+        let fileName = "\(thisFeedItem.uniqueID)\(imageNumber)"
+        // Create the file path
+        let uniquePath = tmpDirectory.stringByAppendingPathComponent(fileName)
+        // Check to see if the filtered thumbnail already exists in the cache
+        if !NSFileManager.defaultManager().fileExistsAtPath(uniquePath) {
+            // Add a filter to the thumbnail
+            let thumbnailData = self.thisFeedItem.thumbnail
+            let filter = self.filters[imageNumber]
+            // Get the UIImage
+            let image = filteredImageFromImage(thumbnailData, filter: filter)
+            // Get a JPEG representation for the image and write it to the file path
+            // Atomically set to true means that the JPEG is written to a backup file, and if
+            // there are no errors it is then saved to the direct path
+            UIImageJPEGRepresentation(image, 1.0).writeToFile(uniquePath, atomically: true)
+        }
+    }
+    
+    // Grab a cached image from the cache
+    func getCachedImage(imageNumber: Int) -> UIImage {
+        let fileName = "\(thisFeedItem.uniqueID)\(imageNumber)"
+        let uniquePath = tmpDirectory.stringByAppendingPathComponent(fileName)
+        
+        var image: UIImage
+        
+        // Check to see if the filtered thumbnail already exists in the cache
+        if NSFileManager.defaultManager().fileExistsAtPath(uniquePath) {
+            image = UIImage(contentsOfFile: uniquePath)!
+        }
+        else {
+            self.cacheImage(imageNumber)
+            image = UIImage(contentsOfFile: uniquePath)!
+        }
+        
+        return image
+    }
 
     /*
     // MARK: - Navigation
