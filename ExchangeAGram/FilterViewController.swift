@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Social
+import FBSDKCoreKit
 
 // This ViewController was written completely in code (no storyboard implementation)
 class FilterViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
@@ -100,14 +102,38 @@ class FilterViewController: UIViewController, UICollectionViewDelegate, UICollec
     
     // Apply the filtered image and save it to CoreData
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        let filterImage = self.filteredImageFromImage(self.thisFeedItem.image, filter: self.filters[indexPath.row])
-        let imageData = UIImageJPEGRepresentation(filterImage, 1.0)
-        self.thisFeedItem.image = imageData
-        let thumbnailData = UIImageJPEGRepresentation(filterImage, 0.1)
-        self.thisFeedItem.thumbnail = thumbnailData
-        (UIApplication.sharedApplication().delegate as! AppDelegate).saveContext()
-        self.navigationController?.popViewControllerAnimated(true)
+        var alert: UIAlertController = Alert.getAlertWithTextField(viewController: self, header: "Photo Options", message: "Please choose an option", textFieldPlaceholder: "Add caption!")
+        
+        var text: String
+        // Access the TextField from the alert
+        let textField = alert.textFields![0] as! UITextField
+        // Grab the caption
+        if textField.text != nil {
+            text = textField.text
+        }
+        
+        // Add actions
+        // Only add this action if the user is logged into Facebook
+        if FBSDKAccessToken.currentAccessToken() != nil {
+            let postPhotoAction = UIAlertAction(title: "Post Photo to Facebook with Caption", style: UIAlertActionStyle.Destructive) { (UIAlertAction) -> Void in
+                self.shareToFacebook(indexPath)
+                self.saveFilterToCoreData(indexPath)
+            }
+            alert.addAction(postPhotoAction)
+        }
+        
+        let saveFilterAction = UIAlertAction(title: "Save filter without posting to Facebook", style: UIAlertActionStyle.Default) { (UIAlertAction) -> Void in
+            self.saveFilterToCoreData(indexPath)
+        }
+        alert.addAction(saveFilterAction)
+        
+        let cancelAction = UIAlertAction(title: "Select another Filter", style: UIAlertActionStyle.Cancel) { (UIAlertAction) -> Void in }
+        alert.addAction(cancelAction)
+        
+        self.presentViewController(alert, animated: true, completion: nil)
     }
+    
+    // MARK: - Filter Functions
     
     // Return an array of the CIFilters that Apple has provided
     // Reference: https://developer.apple.com/library/mac/documentation/GraphicsImaging/Reference/CoreImageFilterReference/index.html
@@ -203,15 +229,60 @@ class FilterViewController: UIViewController, UICollectionViewDelegate, UICollec
         
         return image
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    
+    // MARK: - CoreData Functions
+    func saveFilterToCoreData(indexPath: NSIndexPath) {
+        let filterImage = self.filteredImageFromImage(self.thisFeedItem.image, filter: self.filters[indexPath.row])
+        let imageData = UIImageJPEGRepresentation(filterImage, 1.0)
+        self.thisFeedItem.image = imageData
+        let thumbnailData = UIImageJPEGRepresentation(filterImage, 0.1)
+        self.thisFeedItem.thumbnail = thumbnailData
+        (UIApplication.sharedApplication().delegate as! AppDelegate).saveContext()
+        self.navigationController?.popViewControllerAnimated(true)
     }
-    */
-
+    
+    // MARK: - Facebook Functions
+    func shareToFacebook(indexPath: NSIndexPath) {
+        // Make sure the user is logged into FB first
+        if FBSDKAccessToken.currentAccessToken() == nil {
+            Alert.showAlertWithText(viewController: self, header: "You are not logged in!", message: "Please login via the Profile page before sharing.")
+        }
+        else {
+            let filterImage = self.filteredImageFromImage(self.thisFeedItem.image, filter: self.filters[indexPath.row])
+            
+            if SLComposeViewController.isAvailableForServiceType(SLServiceTypeFacebook) {
+                var facebookShareSheet: SLComposeViewController = SLComposeViewController(forServiceType: SLServiceTypeFacebook)
+                facebookShareSheet.addImage(filterImage)
+                self.presentViewController(facebookShareSheet, animated: true, completion: nil)
+            }
+            else {
+                Alert.showAlertWithText(viewController: self, header: "Error", message: "Problem posting photo to Facebook.")
+            }
+            
+            /* Build a Facebook Graph request to add a photo with description
+            let imageData = UIImageJPEGRepresentation(filterImage, 1.0)
+            let params = ["data" : imageData, "name" : caption]
+            var fbGraphRequest = FBSDKGraphRequest(graphPath: "me/photos", parameters: params, HTTPMethod: "POST")
+            // Create a FB Graph connection and add the request object with callback handler
+            var fbConnection = FBSDKGraphRequestConnection()
+            fbConnection.addRequest(fbGraphRequest, completionHandler: { (connection, result, error) -> Void in
+                if (error != nil) {
+                    println("\(error.localizedDescription)")
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        Alert.showAlertWithText(viewController: self, header: "Error", message: "Problem posting photo to Facebook.\r\nError description: \(error.localizedDescription)")
+                    })
+                }
+                if (result != nil) {
+                    println("\(result)")
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        Alert.showAlertWithText(viewController: self, header: "Success!", message: "Photo was successfully posted to Facebook.")
+                    })
+                }
+            })
+            
+            // Execute the Graph result
+            fbConnection.start()
+            */
+        }
+    }
 }

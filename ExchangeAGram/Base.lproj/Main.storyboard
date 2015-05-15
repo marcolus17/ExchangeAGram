@@ -69,23 +69,38 @@
                                     </collectionViewCell>
                                 </cells>
                                 <variation key="widthClass=compact" fixedFrame="YES">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="600"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="524"/>
                                 </variation>
                                 <connections>
                                     <outlet property="dataSource" destination="BYZ-38-t0r" id="u5u-WU-pvd"/>
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="Bx2-LJ-rYt"/>
                                 </connections>
                             </collectionView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QNV-Y3-yWu">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                                <items>
+                                    <barButtonItem title="Profile" id="RRC-cn-MRo">
+                                        <connections>
+                                            <action selector="profileBarButtonItemPressed:" destination="BYZ-38-t0r" id="qfb-rZ-3EL"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                                <variation key="widthClass=compact" fixedFrame="YES">
+                                    <rect key="frame" x="0.0" y="524" width="400" height="44"/>
+                                </variation>
+                            </toolbar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <variation key="default">
                             <mask key="subviews">
                                 <exclude reference="H0x-BN-3eL"/>
+                                <exclude reference="QNV-Y3-yWu"/>
                             </mask>
                         </variation>
                         <variation key="widthClass=compact">
                             <mask key="subviews">
                                 <include reference="H0x-BN-3eL"/>
+                                <include reference="QNV-Y3-yWu"/>
                             </mask>
                         </variation>
                     </view>
@@ -104,6 +119,7 @@
                     <connections>
                         <outlet property="collectionView" destination="H0x-BN-3eL" id="S9f-Qk-cHY"/>
                         <outlet property="photosBarButtonItem" destination="D71-71-dxc" id="oCI-EM-LsG"/>
+                        <segue destination="OMA-Nh-vMz" kind="show" identifier="profileSegue" id="g2c-ht-x5z"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -127,6 +143,67 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ujI-5l-3ex" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="565.5" y="1151"/>
+        </scene>
+        <!--Profile View Controller-->
+        <scene sceneID="BBJ-ay-d5Q">
+            <objects>
+                <viewController id="OMA-Nh-vMz" customClass="ProfileViewController" customModule="ExchangeAGram" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="fBo-s4-Nu6"/>
+                        <viewControllerLayoutGuide type="bottom" id="yZF-uH-HJM"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="u9j-pQ-zk9">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="aLc-Tc-M1P">
+                                <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
+                                <variation key="widthClass=compact" fixedFrame="YES">
+                                    <rect key="frame" x="16" y="72" width="100" height="100"/>
+                                </variation>
+                            </imageView>
+                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WxF-Pe-yMP">
+                                <rect key="frame" x="0.0" y="-21" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                                <variation key="widthClass=compact" fixedFrame="YES">
+                                    <rect key="frame" x="124" y="99" width="210" height="46"/>
+                                </variation>
+                            </label>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="B7Y-d1-xYy" customClass="FBSDKLoginButton">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <variation key="widthClass=compact" fixedFrame="YES">
+                                    <rect key="frame" x="60" y="518" width="200" height="40"/>
+                                </variation>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <variation key="default">
+                            <mask key="subviews">
+                                <exclude reference="aLc-Tc-M1P"/>
+                                <exclude reference="WxF-Pe-yMP"/>
+                                <exclude reference="B7Y-d1-xYy"/>
+                            </mask>
+                        </variation>
+                        <variation key="widthClass=compact">
+                            <mask key="subviews">
+                                <include reference="aLc-Tc-M1P"/>
+                                <include reference="WxF-Pe-yMP"/>
+                                <include reference="B7Y-d1-xYy"/>
+                            </mask>
+                        </variation>
+                    </view>
+                    <connections>
+                        <outlet property="fbLoginButton" destination="B7Y-d1-xYy" id="71h-qF-Kyb"/>
+                        <outlet property="nameLabel" destination="WxF-Pe-yMP" id="mEd-26-g9J"/>
+                        <outlet property="profileImageView" destination="aLc-Tc-M1P" id="zx0-qq-6WF"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="qWe-8I-lNj" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2290.5" y="490"/>
         </scene>
     </scenes>
 </document>
