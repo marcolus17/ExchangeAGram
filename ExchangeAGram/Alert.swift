@@ -16,4 +16,15 @@ class Alert {
         alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
         viewController.presentViewController(alert, animated: true, completion: nil)
     }
+    
+    // Show an alertView that contains a TextField for data entry
+    class func getAlertWithTextField(#viewController: UIViewController, header: String, message: String, textFieldPlaceholder: String) -> UIAlertController {
+        let alert = UIAlertController(title: header, message: message, preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addTextFieldWithConfigurationHandler { (textField) -> Void in
+            textField.placeholder = textFieldPlaceholder
+            textField.secureTextEntry = false
+        }
+        
+        return alert
+    }
 }

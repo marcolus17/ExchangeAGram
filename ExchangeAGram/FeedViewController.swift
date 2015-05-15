@@ -23,6 +23,19 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
 
         // Do any additional setup after loading the view.
         
+        // Grab previously saved images out of CoreData
+        self.performFetchRequest()
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // Grab altered images out of CoreData and reload the CollectionView
+        self.performFetchRequest()
+        collectionView.reloadData()
+    }
+    
+    func performFetchRequest() {
         // Perform fetch request
         let request = NSFetchRequest(entityName: "FeedItem")
         let managedObjectContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
@@ -71,13 +84,21 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
     // MARK: - UIImagePickerControllerDelegate Functions
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [NSObject : AnyObject]) {
         let image = info[UIImagePickerControllerOriginalImage] as! UIImage
+        // Save a high res version of our image
         let imageData = UIImageJPEGRepresentation(image, 1.0)
+        // Save a thumbnail version that is 1/10th the size
+        let thumbNailData = UIImageJPEGRepresentation(image, 0.1)
         
         let managedObjectContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
         let entityDescription = NSEntityDescription.entityForName("FeedItem", inManagedObjectContext: managedObjectContext!)
         let feedItem = FeedItem(entity: entityDescription!, insertIntoManagedObjectContext: managedObjectContext!)
         feedItem.image = imageData
         feedItem.caption = "test caption"
+        feedItem.thumbnail = thumbNailData
+        
+        // Add a unique identifier to better track cached thumbnails
+        let UUID = NSUUID().UUIDString
+        feedItem.uniqueID = UUID
         
         (UIApplication.sharedApplication().delegate as! AppDelegate).saveContext()
         
@@ -88,10 +109,8 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
         self.collectionView.reloadData()
     }
     
-
-    /*
     // MARK: - Navigation
-
+    /*
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         // Get the new view controller using segue.destinationViewController.
@@ -140,6 +159,11 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
         else {
             Alert.showAlertWithText(viewController: self, header: "Photo Library Error", message: "The photo library is not available.")
         }
+    }
+    
+    // Show the ProfileViewController
+    @IBAction func profileBarButtonItemPressed(sender: UIBarButtonItem) {
+        self.performSegueWithIdentifier("profileSegue", sender: sender)
     }
 
 }

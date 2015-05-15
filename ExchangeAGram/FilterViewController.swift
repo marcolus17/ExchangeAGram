@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Social
+import FBSDKCoreKit
 
 // This ViewController was written completely in code (no storyboard implementation)
 class FilterViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
@@ -24,6 +26,11 @@ class FilterViewController: UIViewController, UICollectionViewDelegate, UICollec
     // Used to change the properties of our filters
     let kSaturation = 0.5
     let kIntensity = 0.7
+    
+    // Optimization - Holds a placeholder image for our CollectionView cells
+    let placeHolderImage = UIImage(named: "Placeholder")
+    
+    let tmpDirectory = NSTemporaryDirectory()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,7 +42,7 @@ class FilterViewController: UIViewController, UICollectionViewDelegate, UICollec
         // Gives the layout borders
         layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         // The size of each item in the CollectionView
-        layout.itemSize = CGSize(width: 150.0, height: 150.0)
+        layout.itemSize = CGSize(width: 140.0, height: 140.0)
         collectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: layout)
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -62,10 +69,71 @@ class FilterViewController: UIViewController, UICollectionViewDelegate, UICollec
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell: FilterCell = collectionView.dequeueReusableCellWithReuseIdentifier("MyCell", forIndexPath: indexPath) as! FilterCell
-        // Grab the selected photo and apply the currently selected filter
-        cell.imageView.image = filteredImageFromImage(thisFeedItem.image, filter: filters[indexPath.row])
+        
+        // Optimization - Prevents the CollectionView from adding a filter to our image each time we scroll, etc.
+        if cell.imageView.image == nil {
+            // Optimization - Using the property to prevent the creation of the placeholder image over and over again
+            cell.imageView.image = placeHolderImage
+            
+            // Use Grand Central Dispatch (GCD) to apply filters without interrupting the main thread
+            // NOTE: Always make UI changes on the main thread!
+            
+            // Create a new queue
+            let filterQueue: dispatch_queue_t = dispatch_queue_create("filter queue", nil)
+            
+            // Run this block of code when the queue is ready to be processed on a background thread
+            dispatch_async(filterQueue, { () -> Void in
+                // Apply the filter to the currently selected photo
+                // Optimization - Apply the filter to the thumbnail instead of the high res photo
+                    // let filterImage = self.filteredImageFromImage(self.thisFeedItem.thumbnail, filter: self.filters[indexPath.row])
+                // Use the cached thumbnail instead of recreating it
+                let filterImage = self.getCachedImage(indexPath.row)
+                
+                // Jump back to the main thread to apply the UI changes
+                // The ImageViews will populate over time because the main thread is waiting for the filters to finish being applied
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    cell.imageView.image = filterImage
+                })
+            })
+        }
+        
         return cell
     }
+    
+    // Apply the filtered image and save it to CoreData
+    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        var alert: UIAlertController = Alert.getAlertWithTextField(viewController: self, header: "Photo Options", message: "Please choose an option", textFieldPlaceholder: "Add caption!")
+        
+        var text: String
+        // Access the TextField from the alert
+        let textField = alert.textFields![0] as! UITextField
+        // Grab the caption
+        if textField.text != nil {
+            text = textField.text
+        }
+        
+        // Add actions
+        // Only add this action if the user is logged into Facebook
+        if FBSDKAccessToken.currentAccessToken() != nil {
+            let postPhotoAction = UIAlertAction(title: "Post Photo to Facebook with Caption", style: UIAlertActionStyle.Destructive) { (UIAlertAction) -> Void in
+                self.shareToFacebook(indexPath)
+                self.saveFilterToCoreData(indexPath)
+            }
+            alert.addAction(postPhotoAction)
+        }
+        
+        let saveFilterAction = UIAlertAction(title: "Save filter without posting to Facebook", style: UIAlertActionStyle.Default) { (UIAlertAction) -> Void in
+            self.saveFilterToCoreData(indexPath)
+        }
+        alert.addAction(saveFilterAction)
+        
+        let cancelAction = UIAlertAction(title: "Select another Filter", style: UIAlertActionStyle.Cancel) { (UIAlertAction) -> Void in }
+        alert.addAction(cancelAction)
+        
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    // MARK: - Filter Functions
     
     // Return an array of the CIFilters that Apple has provided
     // Reference: https://developer.apple.com/library/mac/documentation/GraphicsImaging/Reference/CoreImageFilterReference/index.html
@@ -121,15 +189,100 @@ class FilterViewController: UIViewController, UICollectionViewDelegate, UICollec
         return finalImage!
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    // MARK: - Caching Functions
+    
+    // Cache the filtered thumbnail image
+    // Image number = indexPath.row
+    func cacheImage(imageNumber: Int) {
+        let fileName = "\(thisFeedItem.uniqueID)\(imageNumber)"
+        // Create the file path
+        let uniquePath = tmpDirectory.stringByAppendingPathComponent(fileName)
+        // Check to see if the filtered thumbnail already exists in the cache
+        if !NSFileManager.defaultManager().fileExistsAtPath(uniquePath) {
+            // Add a filter to the thumbnail
+            let thumbnailData = self.thisFeedItem.thumbnail
+            let filter = self.filters[imageNumber]
+            // Get the UIImage
+            let image = filteredImageFromImage(thumbnailData, filter: filter)
+            // Get a JPEG representation for the image and write it to the file path
+            // Atomically set to true means that the JPEG is written to a backup file, and if
+            // there are no errors it is then saved to the direct path
+            UIImageJPEGRepresentation(image, 1.0).writeToFile(uniquePath, atomically: true)
+        }
     }
-    */
-
+    
+    // Grab a cached image from the cache
+    func getCachedImage(imageNumber: Int) -> UIImage {
+        let fileName = "\(thisFeedItem.uniqueID)\(imageNumber)"
+        let uniquePath = tmpDirectory.stringByAppendingPathComponent(fileName)
+        
+        var image: UIImage
+        
+        // Check to see if the filtered thumbnail already exists in the cache
+        if NSFileManager.defaultManager().fileExistsAtPath(uniquePath) {
+            image = UIImage(contentsOfFile: uniquePath)!
+        }
+        else {
+            self.cacheImage(imageNumber)
+            image = UIImage(contentsOfFile: uniquePath)!
+        }
+        
+        return image
+    }
+    
+    // MARK: - CoreData Functions
+    func saveFilterToCoreData(indexPath: NSIndexPath) {
+        let filterImage = self.filteredImageFromImage(self.thisFeedItem.image, filter: self.filters[indexPath.row])
+        let imageData = UIImageJPEGRepresentation(filterImage, 1.0)
+        self.thisFeedItem.image = imageData
+        let thumbnailData = UIImageJPEGRepresentation(filterImage, 0.1)
+        self.thisFeedItem.thumbnail = thumbnailData
+        (UIApplication.sharedApplication().delegate as! AppDelegate).saveContext()
+        self.navigationController?.popViewControllerAnimated(true)
+    }
+    
+    // MARK: - Facebook Functions
+    func shareToFacebook(indexPath: NSIndexPath) {
+        // Make sure the user is logged into FB first
+        if FBSDKAccessToken.currentAccessToken() == nil {
+            Alert.showAlertWithText(viewController: self, header: "You are not logged in!", message: "Please login via the Profile page before sharing.")
+        }
+        else {
+            let filterImage = self.filteredImageFromImage(self.thisFeedItem.image, filter: self.filters[indexPath.row])
+            
+            if SLComposeViewController.isAvailableForServiceType(SLServiceTypeFacebook) {
+                var facebookShareSheet: SLComposeViewController = SLComposeViewController(forServiceType: SLServiceTypeFacebook)
+                facebookShareSheet.addImage(filterImage)
+                self.presentViewController(facebookShareSheet, animated: true, completion: nil)
+            }
+            else {
+                Alert.showAlertWithText(viewController: self, header: "Error", message: "Problem posting photo to Facebook.")
+            }
+            
+            /* Build a Facebook Graph request to add a photo with description
+            let imageData = UIImageJPEGRepresentation(filterImage, 1.0)
+            let params = ["data" : imageData, "name" : caption]
+            var fbGraphRequest = FBSDKGraphRequest(graphPath: "me/photos", parameters: params, HTTPMethod: "POST")
+            // Create a FB Graph connection and add the request object with callback handler
+            var fbConnection = FBSDKGraphRequestConnection()
+            fbConnection.addRequest(fbGraphRequest, completionHandler: { (connection, result, error) -> Void in
+                if (error != nil) {
+                    println("\(error.localizedDescription)")
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        Alert.showAlertWithText(viewController: self, header: "Error", message: "Problem posting photo to Facebook.\r\nError description: \(error.localizedDescription)")
+                    })
+                }
+                if (result != nil) {
+                    println("\(result)")
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        Alert.showAlertWithText(viewController: self, header: "Success!", message: "Photo was successfully posted to Facebook.")
+                    })
+                }
+            })
+            
+            // Execute the Graph result
+            fbConnection.start()
+            */
+        }
+    }
 }
