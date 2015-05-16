@@ -7,11 +7,10 @@
 //
 
 import UIKit
-import Social
-import FBSDKCoreKit
+import FBSDKShareKit
 
 // This ViewController was written completely in code (no storyboard implementation)
-class FilterViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
+class FilterViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, FBSDKSharingDelegate {
     
     // Holds the currently chosen item
     var thisFeedItem: FeedItem!
@@ -104,25 +103,24 @@ class FilterViewController: UIViewController, UICollectionViewDelegate, UICollec
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         var alert: UIAlertController = Alert.getAlertWithTextField(viewController: self, header: "Photo Options", message: "Please choose an option", textFieldPlaceholder: "Add caption!")
         
-        var text: String
-        // Access the TextField from the alert
-        let textField = alert.textFields![0] as! UITextField
-        // Grab the caption
-        if textField.text != nil {
-            text = textField.text
-        }
-        
         // Add actions
         // Only add this action if the user is logged into Facebook
         if FBSDKAccessToken.currentAccessToken() != nil {
             let postPhotoAction = UIAlertAction(title: "Post Photo to Facebook with Caption", style: UIAlertActionStyle.Destructive) { (UIAlertAction) -> Void in
+                // Access the TextField from the alert and grab the caption
+                let textField = alert.textFields![0] as! UITextField
+                self.thisFeedItem.caption = textField.text
+                
                 self.shareToFacebook(indexPath)
-                self.saveFilterToCoreData(indexPath)
             }
             alert.addAction(postPhotoAction)
         }
         
         let saveFilterAction = UIAlertAction(title: "Save filter without posting to Facebook", style: UIAlertActionStyle.Default) { (UIAlertAction) -> Void in
+            // Access the TextField from the alert and grab the caption
+            let textField = alert.textFields![0] as! UITextField
+            self.thisFeedItem.caption = textField.text
+            
             self.saveFilterToCoreData(indexPath)
         }
         alert.addAction(saveFilterAction)
@@ -250,39 +248,37 @@ class FilterViewController: UIViewController, UICollectionViewDelegate, UICollec
         else {
             let filterImage = self.filteredImageFromImage(self.thisFeedItem.image, filter: self.filters[indexPath.row])
             
-            if SLComposeViewController.isAvailableForServiceType(SLServiceTypeFacebook) {
-                var facebookShareSheet: SLComposeViewController = SLComposeViewController(forServiceType: SLServiceTypeFacebook)
-                facebookShareSheet.addImage(filterImage)
-                self.presentViewController(facebookShareSheet, animated: true, completion: nil)
-            }
-            else {
-                Alert.showAlertWithText(viewController: self, header: "Error", message: "Problem posting photo to Facebook.")
-            }
+            // Share the photo to Facebook using the Facebook share sheet
+            var photo: FBSDKSharePhoto = FBSDKSharePhoto()
+            var content: FBSDKSharePhotoContent = FBSDKSharePhotoContent()
+            var dialog: FBSDKShareDialog = FBSDKShareDialog()
             
-            /* Build a Facebook Graph request to add a photo with description
-            let imageData = UIImageJPEGRepresentation(filterImage, 1.0)
-            let params = ["data" : imageData, "name" : caption]
-            var fbGraphRequest = FBSDKGraphRequest(graphPath: "me/photos", parameters: params, HTTPMethod: "POST")
-            // Create a FB Graph connection and add the request object with callback handler
-            var fbConnection = FBSDKGraphRequestConnection()
-            fbConnection.addRequest(fbGraphRequest, completionHandler: { (connection, result, error) -> Void in
-                if (error != nil) {
-                    println("\(error.localizedDescription)")
-                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                        Alert.showAlertWithText(viewController: self, header: "Error", message: "Problem posting photo to Facebook.\r\nError description: \(error.localizedDescription)")
-                    })
-                }
-                if (result != nil) {
-                    println("\(result)")
-                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                        Alert.showAlertWithText(viewController: self, header: "Success!", message: "Photo was successfully posted to Facebook.")
-                    })
-                }
-            })
-            
-            // Execute the Graph result
-            fbConnection.start()
-            */
+            photo.image = filterImage
+            photo.userGenerated = true
+            content.photos = [photo]
+            dialog.fromViewController = self
+            dialog.shareContent = content
+            dialog.mode = FBSDKShareDialogMode.ShareSheet
+            dialog.delegate = self
+            dialog.show()
         }
+    }
+    
+    // Saving the photo only after the ShareSheet is closed
+    func sharer(sharer: FBSDKSharing!, didCompleteWithResults results: [NSObject : AnyObject]!) {
+        // User shared the photo
+        let indexPath: NSIndexPath = collectionView.indexPathsForSelectedItems().first as! NSIndexPath
+        self.saveFilterToCoreData(indexPath)
+    }
+    
+    func sharerDidCancel(sharer: FBSDKSharing!) {
+        // User clicked cancel. Do nothing
+    }
+    
+    func sharer(sharer: FBSDKSharing!, didFailWithError error: NSError!) {
+        // Sharing failed
+        Alert.showAlertWithText(viewController: self, header: "Sharing Failed", message: "Share to Facebook failed: \(error.localizedDescription)")
+        let indexPath: NSIndexPath = collectionView.indexPathsForSelectedItems().first as! NSIndexPath
+        self.saveFilterToCoreData(indexPath)
     }
 }
