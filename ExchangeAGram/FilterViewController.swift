@@ -168,7 +168,8 @@ class FilterViewController: UIViewController, UICollectionViewDelegate, UICollec
     
     // A helper function that saves a filter to our image
     func filteredImageFromImage(imageData: NSData, filter: CIFilter) -> UIImage {
-        
+        // Save original image orientation
+        let orientation = UIImage(data: imageData)!.imageOrientation
         // CIImage holds the data of the image
         let unfilteredImage = CIImage(data: imageData)
         // Pass the unfiltered image to the filter
@@ -182,7 +183,7 @@ class FilterViewController: UIViewController, UICollectionViewDelegate, UICollec
         let cgImage: CGImageRef = context.createCGImage(filteredImage, fromRect: extent)
         
         // Create the UIImage to return
-        let finalImage = UIImage(CGImage: cgImage)
+        let finalImage = UIImage(CGImage: cgImage, scale: 1.0, orientation: orientation)
         
         return finalImage!
     }

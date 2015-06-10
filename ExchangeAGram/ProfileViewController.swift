@@ -93,7 +93,7 @@ class ProfileViewController: UIViewController, FBSDKLoginButtonDelegate {
             self.profileImageView.hidden = true
         }
     }
-
+    
     /*
     // MARK: - Navigation
 
@@ -103,5 +103,9 @@ class ProfileViewController: UIViewController, FBSDKLoginButtonDelegate {
         // Pass the selected object to the new view controller.
     }
     */
+    
+    @IBAction func mapViewButtonPressed(sender: UIButton) {
+        performSegueWithIdentifier("mapSegue", sender: nil)
+    }
 
 }

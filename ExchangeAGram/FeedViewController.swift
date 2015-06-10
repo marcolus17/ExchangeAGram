@@ -9,14 +9,17 @@
 import UIKit
 import MobileCoreServices
 import CoreData
+import MapKit
 
 // Add the DataSource and Delegates. Make sure to add connections in SB for UICollectionView
-class FeedViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class FeedViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, CLLocationManagerDelegate {
     // UI Outlets
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var photosBarButtonItem: UIBarButtonItem!
     
     var feedArray: [AnyObject] = []
+    
+    var locationManager: CLLocationManager!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,6 +28,8 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
         
         // Grab previously saved images out of CoreData
         self.performFetchRequest()
+        // Setup the location manager
+        self.setupLocationManager()
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -40,6 +45,21 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
         let request = NSFetchRequest(entityName: "FeedItem")
         let managedObjectContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
         feedArray = managedObjectContext.executeFetchRequest(request, error: nil)!
+    }
+    
+    func setupLocationManager() {
+        locationManager = CLLocationManager()
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        /*
+        Request authorization for the phone to track location - added authorization Strings to info.plist
+        Be sure to add this above locationManager.distanceFilter
+        */
+        locationManager.requestAlwaysAuthorization()
+        // The distance needed to be exceeded before the location is updated
+        locationManager.distanceFilter = 100.0
+        // Grab an initial location
+        locationManager.startUpdatingLocation()
     }
 
     override func didReceiveMemoryWarning() {
@@ -96,6 +116,10 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
         feedItem.caption = "test caption"
         feedItem.thumbnail = thumbNailData
         
+        // Adding location data
+        feedItem.latitude = locationManager.location.coordinate.latitude
+        feedItem.longitude = locationManager.location.coordinate.longitude
+        
         // Add a unique identifier to better track cached thumbnails
         let UUID = NSUUID().UUIDString
         feedItem.uniqueID = UUID
@@ -107,6 +131,11 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
         self.dismissViewControllerAnimated(true, completion: nil)
         
         self.collectionView.reloadData()
+    }
+    
+    // MARK: - LocationManager Delegate Functions
+    func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
+        println("locations = \(locations)")
     }
     
     // MARK: - Navigation

@@ -2,7 +2,7 @@
 //  FeedItem.swift
 //  ExchangeAGram
 //
-//  Created by Nicholas Markworth on 5/14/15.
+//  Created by Nicholas Markworth on 6/9/15.
 //  Copyright (c) 2015 Nick Markworth. All rights reserved.
 //
 
@@ -15,9 +15,9 @@ class FeedItem: NSManagedObject {
 
     @NSManaged var caption: String
     @NSManaged var image: NSData
-    // NOTE: When we added this attribute we needed to delete the existing
-    // FeedItem class and create a new one
     @NSManaged var thumbnail: NSData
     @NSManaged var uniqueID: String
+    @NSManaged var latitude: NSNumber
+    @NSManaged var longitude: NSNumber
 
 }

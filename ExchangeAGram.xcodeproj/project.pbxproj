@@ -9,8 +9,9 @@
 /* Begin PBXBuildFile section */
 		1C20FF301B041C060024D22E /* FilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C20FF2F1B041C060024D22E /* FilterViewController.swift */; };
 		1C20FF321B04219B0024D22E /* FilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C20FF311B04219B0024D22E /* FilterCell.swift */; };
+		1C45C0FE1B27BF1D00C29884 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C45C0FD1B27BF1D00C29884 /* MapViewController.swift */; };
+		1C45C1001B27C66E00C29884 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C45C0FF1B27C66D00C29884 /* MapKit.framework */; };
 		1C647D111B04FF8900A35378 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C647D101B04FF8900A35378 /* ProfileViewController.swift */; };
-		1C647D131B0505B900A35378 /* FeedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C647D121B0505B900A35378 /* FeedItem.swift */; };
 		1C647D171B050E3D00A35378 /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C647D141B050E3D00A35378 /* FBSDKCoreKit.framework */; };
 		1C647D181B050E3D00A35378 /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C647D151B050E3D00A35378 /* FBSDKLoginKit.framework */; };
 		1C647D191B050E3D00A35378 /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C647D161B050E3D00A35378 /* FBSDKShareKit.framework */; };
@@ -24,6 +25,7 @@
 		1C82E2DC1B02E06C0097A6AA /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C82E2DB1B02E06C0097A6AA /* FeedCell.swift */; };
 		1C82E2DE1B02E3690097A6AA /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82E2DD1B02E3690097A6AA /* MobileCoreServices.framework */; };
 		1C82E2E01B02E8050097A6AA /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C82E2DF1B02E8050097A6AA /* Alert.swift */; };
+		1CE876F71B27CE2900FE0456 /* FeedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CE876F61B27CE2900FE0456 /* FeedItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,8 +41,9 @@
 /* Begin PBXFileReference section */
 		1C20FF2F1B041C060024D22E /* FilterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterViewController.swift; sourceTree = "<group>"; };
 		1C20FF311B04219B0024D22E /* FilterCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterCell.swift; sourceTree = "<group>"; };
+		1C45C0FD1B27BF1D00C29884 /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
+		1C45C0FF1B27C66D00C29884 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		1C647D101B04FF8900A35378 /* ProfileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
-		1C647D121B0505B900A35378 /* FeedItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedItem.swift; sourceTree = "<group>"; };
 		1C647D141B050E3D00A35378 /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKCoreKit.framework; path = ../../../../FacebookSDK/FBSDKCoreKit.framework; sourceTree = "<group>"; };
 		1C647D151B050E3D00A35378 /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKLoginKit.framework; path = ../../../../FacebookSDK/FBSDKLoginKit.framework; sourceTree = "<group>"; };
 		1C647D161B050E3D00A35378 /* FBSDKShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKShareKit.framework; path = ../../../../FacebookSDK/FBSDKShareKit.framework; sourceTree = "<group>"; };
@@ -58,6 +61,7 @@
 		1C82E2DB1B02E06C0097A6AA /* FeedCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedCell.swift; sourceTree = "<group>"; };
 		1C82E2DD1B02E3690097A6AA /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		1C82E2DF1B02E8050097A6AA /* Alert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
+		1CE876F61B27CE2900FE0456 /* FeedItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C45C1001B27C66E00C29884 /* MapKit.framework in Frameworks */,
 				1C647D191B050E3D00A35378 /* FBSDKShareKit.framework in Frameworks */,
 				1C82E2DE1B02E3690097A6AA /* MobileCoreServices.framework in Frameworks */,
 				1C647D171B050E3D00A35378 /* FBSDKCoreKit.framework in Frameworks */,
@@ -85,7 +90,7 @@
 		1C20FF351B0441420024D22E /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				1C647D121B0505B900A35378 /* FeedItem.swift */,
+				1CE876F61B27CE2900FE0456 /* FeedItem.swift */,
 				1C82E2DF1B02E8050097A6AA /* Alert.swift */,
 				1C82E2B81B02D7070097A6AA /* ExchangeAGram.xcdatamodeld */,
 			);
@@ -117,6 +122,7 @@
 				1C82E2D91B02D9000097A6AA /* FeedViewController.swift */,
 				1C20FF311B04219B0024D22E /* FilterCell.swift */,
 				1C20FF2F1B041C060024D22E /* FilterViewController.swift */,
+				1C45C0FD1B27BF1D00C29884 /* MapViewController.swift */,
 				1C82E2C21B02D7070097A6AA /* LaunchScreen.xib */,
 				1C82E2BD1B02D7070097A6AA /* Main.storyboard */,
 				1C647D101B04FF8900A35378 /* ProfileViewController.swift */,
@@ -129,6 +135,7 @@
 		1C82E2B41B02D7070097A6AA /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				1C45C0FF1B27C66D00C29884 /* MapKit.framework */,
 				1C647D141B050E3D00A35378 /* FBSDKCoreKit.framework */,
 				1C647D151B050E3D00A35378 /* FBSDKLoginKit.framework */,
 				1C647D161B050E3D00A35378 /* FBSDKShareKit.framework */,
@@ -206,6 +213,7 @@
 				TargetAttributes = {
 					1C82E2B01B02D7070097A6AA = {
 						CreatedOnToolsVersion = 6.3.1;
+						DevelopmentTeam = 848TS5H4UM;
 					};
 					1C82E2C81B02D7080097A6AA = {
 						CreatedOnToolsVersion = 6.3.1;
@@ -260,11 +268,12 @@
 				1C20FF301B041C060024D22E /* FilterViewController.swift in Sources */,
 				1C20FF321B04219B0024D22E /* FilterCell.swift in Sources */,
 				1C82E2B71B02D7070097A6AA /* AppDelegate.swift in Sources */,
+				1C45C0FE1B27BF1D00C29884 /* MapViewController.swift in Sources */,
 				1C82E2DC1B02E06C0097A6AA /* FeedCell.swift in Sources */,
 				1C82E2DA1B02D9000097A6AA /* FeedViewController.swift in Sources */,
-				1C647D131B0505B900A35378 /* FeedItem.swift in Sources */,
 				1C647D111B04FF8900A35378 /* ProfileViewController.swift in Sources */,
 				1C82E2E01B02E8050097A6AA /* Alert.swift in Sources */,
+				1CE876F71B27CE2900FE0456 /* FeedItem.swift in Sources */,
 				1C82E2BA1B02D7070097A6AA /* ExchangeAGram.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -394,6 +403,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/nmarkworth1/Developer/FacebookSDK,
@@ -401,6 +412,7 @@
 				INFOPLIST_FILE = ExchangeAGram/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -408,6 +420,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/nmarkworth1/Developer/FacebookSDK,
@@ -415,6 +429,7 @@
 				INFOPLIST_FILE = ExchangeAGram/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};
