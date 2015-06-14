@@ -26,6 +26,10 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
 
         // Do any additional setup after loading the view.
         
+        // Set the background image to a nicer photo
+        let backgroundImage = UIImage(named: "AutumnBackground")
+        self.view.backgroundColor = UIColor(patternImage: backgroundImage!)
+        
         // Grab previously saved images out of CoreData
         self.performFetchRequest()
         // Setup the location manager
